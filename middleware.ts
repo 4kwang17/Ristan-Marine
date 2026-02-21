@@ -60,16 +60,22 @@ export async function middleware(request: NextRequest) {
 
   // ── Admin routes ──────────────────────────────────────────────────────────
   if (pathname.startsWith('/admin')) {
+    const referer = request.headers.get('referer')
+    const origin = request.nextUrl.origin
+    const isSameOriginNonAdmin =
+      referer && referer.startsWith(origin) && !new URL(referer).pathname.startsWith('/admin')
+    const fallback = request.nextUrl.clone()
+    fallback.pathname = '/'
+    fallback.search = ''
+    const backUrl = isSameOriginNonAdmin ? referer! : fallback.toString()
+
     if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/catalog/login'
-      url.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(url)
+      return NextResponse.redirect(backUrl)
     }
 
     const role = (user as any)?.app_metadata?.role
     if (role !== 'admin') {
-      return new NextResponse('Forbidden', { status: 403 })
+      return NextResponse.redirect(backUrl)
     }
     return supabaseResponse
   }

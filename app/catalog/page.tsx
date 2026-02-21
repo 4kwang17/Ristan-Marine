@@ -117,20 +117,21 @@ export default function CatalogPage() {
         )}
       </form>
 
+      {/* Mobile category filter (above grid) */}
+      <div className="lg:hidden mb-4">
+        <select
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A73E8]"
+        >
+          <option value="">{c.allCategories}</option>
+        </select>
+      </div>
+
       {/* Grid + Sidebar */}
       <div className="flex gap-4">
         <div className="hidden lg:block w-48 flex-shrink-0">
           <CategoryFilter selected={category} onSelect={setCategory} />
-        </div>
-
-        <div className="lg:hidden mb-4 w-full">
-          <select
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A73E8]"
-          >
-            <option value="">{c.allCategories}</option>
-          </select>
         </div>
 
         <div className="flex-1 min-w-0">

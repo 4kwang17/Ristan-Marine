@@ -41,6 +41,14 @@ export default function CatalogLoginPage() {
       if (authError) throw authError
 
       if (data.user) {
+        const isAdmin = data.user.app_metadata?.role === 'admin'
+
+        if (isAdmin) {
+          router.push('/admin')
+          router.refresh()
+          return
+        }
+
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('expires_at, is_active')

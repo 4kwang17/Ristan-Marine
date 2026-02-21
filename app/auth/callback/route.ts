@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
     .single()
 
   if (!existingProfile) {
-    // New OAuth user: create profile with 30-day trial
+    // New OAuth user: create profile with 3-month trial
     const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + 30)
+    expiresAt.setMonth(expiresAt.getMonth() + 3)
 
     const fullName =
       user.user_metadata?.full_name ||

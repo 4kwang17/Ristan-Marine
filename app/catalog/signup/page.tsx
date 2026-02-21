@@ -55,9 +55,9 @@ export default function SignupPage() {
       if (authError) throw authError
       if (!data.user) throw new Error('Signup failed')
 
-      // Create user_profile with 30-day trial
+      // Create user_profile with 3-month trial
       const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + 30)
+      expiresAt.setMonth(expiresAt.getMonth() + 3)
 
       const { error: profileError } = await supabase
         .from('user_profiles')
