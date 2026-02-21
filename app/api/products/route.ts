@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('products')
-      .select('id,item_name_kr,item_name_en,impa_code,issa_code,category,unit,price_krw,brand,image,country_of_origin', { count: 'exact' })
+      .select('id,item_name_kr,item_name_en,impa_code,issa_code,category,unit,price_krw,brand,image', { count: 'exact' })
 
     if (category) {
       query = query.eq('category', category)

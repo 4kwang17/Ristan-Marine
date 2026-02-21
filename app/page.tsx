@@ -14,7 +14,7 @@ const AREA_META = [
 ]
 
 const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 1, y: 20 },
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.4 },
 }
@@ -82,7 +82,7 @@ export default function HomePage() {
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 1, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
@@ -107,7 +107,7 @@ export default function HomePage() {
           {businessAreas.map((area, i) => (
             <motion.div
               key={area.number}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4 }}

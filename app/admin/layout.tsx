@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import AdminLogoutButton from '@/components/admin/AdminLogoutButton'
 
 export const metadata: Metadata = {
   title: '관리자 - Ristan Marine',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       {/* Sidebar */}
       <aside className="w-56 bg-[#191F28] text-white flex-shrink-0 flex flex-col">
         <div className="p-5 border-b border-[#2D3748]">
@@ -37,13 +38,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-[#2D3748]">
+        <div className="p-4 border-t border-[#2D3748] space-y-2">
           <Link href="/" className="flex items-center gap-2 text-sm text-[#8B95A1] hover:text-white transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             사이트로 돌아가기
           </Link>
+          <AdminLogoutButton />
         </div>
       </aside>
 

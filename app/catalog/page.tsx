@@ -33,6 +33,12 @@ export default function CatalogPage() {
   const [searchInput, setSearchInput] = useState('')
   const [daysLeft, setDaysLeft] = useState<number | null>(null)
 
+  // Debounced auto-search: fires 400ms after typing stops
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput), 400)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
   useEffect(() => {
     const loadProfile = async () => {
       const supabase = createClient()
@@ -64,7 +70,7 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:h-[calc(100vh-4rem)] lg:flex lg:flex-col">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -129,12 +135,12 @@ export default function CatalogPage() {
       </div>
 
       {/* Grid + Sidebar */}
-      <div className="flex gap-4">
-        <div className="hidden lg:block w-48 flex-shrink-0">
+      <div className="flex gap-4 lg:flex-1 lg:min-h-0">
+        <div className="hidden lg:flex lg:flex-col w-48 flex-shrink-0">
           <CategoryFilter selected={category} onSelect={setCategory} />
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 lg:min-h-0">
           <ProductGrid category={category} search={search} />
         </div>
       </div>

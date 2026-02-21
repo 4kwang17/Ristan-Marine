@@ -44,8 +44,7 @@ export default function CatalogLoginPage() {
         const isAdmin = data.user.app_metadata?.role === 'admin'
 
         if (isAdmin) {
-          router.push('/admin')
-          router.refresh()
+          window.location.href = '/admin'
           return
         }
 
@@ -65,12 +64,11 @@ export default function CatalogLoginPage() {
         }
         if (new Date(profile.expires_at) < new Date()) {
           await supabase.auth.signOut()
-          router.push('/catalog/expired')
+          window.location.href = '/catalog/expired'
           return
         }
 
-        router.push('/catalog')
-        router.refresh()
+        window.location.href = '/catalog'
       }
     } catch (err: any) {
       setError(err.message === 'Invalid login credentials' ? l.invalidCredentials : err.message)

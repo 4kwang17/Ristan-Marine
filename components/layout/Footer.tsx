@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useLang } from '@/lib/i18n'
 
 export default function Footer() {
@@ -8,8 +9,12 @@ export default function Footer() {
   const f = t.footer
   const n = t.nav
 
+  const pathname = usePathname()
+  if (pathname.startsWith('/admin')) return null
+  if (pathname === '/catalog') return null
+
   return (
-    <footer className="bg-[#191F28] text-[#8B95A1] mt-20">
+    <footer className="bg-[#191F28] text-[#8B95A1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}

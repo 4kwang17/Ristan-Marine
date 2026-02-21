@@ -44,9 +44,9 @@ export default function CategoryFilter({ selected, onSelect }: CategoryFilterPro
   const { t } = useLang()
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E5E8EB] p-4 h-full">
+    <div className="bg-white rounded-2xl border border-[#E5E8EB] p-4 h-full flex flex-col">
       <h3 className="font-semibold text-[#191F28] mb-3 text-sm">{t.catalog.category}</h3>
-      <ul className="space-y-0.5 overflow-y-auto max-h-[calc(100vh-220px)]">
+      <ul className="space-y-0.5 overflow-y-auto flex-1">
         <li>
           <button
             onClick={() => onSelect('')}

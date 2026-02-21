@@ -11,6 +11,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, setLang, t } = useLang()
 
+  if (pathname.startsWith('/admin')) return null
+
   const navItems = [
     { label: t.nav.company, href: '/company' },
     { label: t.nav.business, href: '/business' },

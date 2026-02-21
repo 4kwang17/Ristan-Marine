@@ -58,7 +58,6 @@ function MobileProductList({ category, search }: ProductGridProps) {
   const startRowRef = useRef(0)
   const isLoadingRef = useRef(false)
 
-  // Reset and load first page when filters change
   useEffect(() => {
     let cancelled = false
     startRowRef.current = 0
@@ -163,9 +162,39 @@ function MobileProductList({ category, search }: ProductGridProps) {
   )
 }
 
+const columnDefs: ColDef[] = [
+  {
+    field: 'image',
+    headerName: '',
+    width: 60,
+    sortable: false,
+    filter: false,
+    cellRenderer: ImageCell,
+    pinned: 'left',
+  },
+  { field: 'item_name_kr', headerName: '한국명', flex: 1, minWidth: 150, filter: false },
+  { field: 'item_name_en', headerName: '영문명', flex: 1, minWidth: 150, filter: false },
+  { field: 'impa_code', headerName: 'IMPA', width: 100, filter: false },
+  { field: 'issa_code', headerName: 'ISSA', width: 100, filter: false },
+  { field: 'category', headerName: '카테고리', width: 140, filter: false },
+  { field: 'brand', headerName: '브랜드', width: 120, filter: false },
+  { field: 'unit', headerName: '단위', width: 80, filter: false },
+  {
+    field: 'price_krw',
+    headerName: '단가(KRW)',
+    width: 120,
+    filter: false,
+    valueFormatter: (params) =>
+      params.value ? `₩${Number(params.value).toLocaleString()}` : '-',
+  },
+]
+
+const defaultColDef: ColDef = { resizable: true, sortable: true }
+
 export default function ProductGrid({ category, search }: ProductGridProps) {
   const gridRef = useRef<AgGridReact>(null)
-  const [isMobile, setIsMobile] = useState(false)
+  // null = not yet determined; avoids AG Grid initialising on mobile
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024)
@@ -174,76 +203,8 @@ export default function ProductGrid({ category, search }: ProductGridProps) {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  const columnDefs: ColDef[] = useMemo(() => [
-    {
-      field: 'image',
-      headerName: '',
-      width: 60,
-      sortable: false,
-      filter: false,
-      cellRenderer: ImageCell,
-      pinned: 'left',
-    },
-    {
-      field: 'item_name_kr',
-      headerName: '한국명',
-      flex: 1,
-      minWidth: 150,
-      filter: false,
-    },
-    {
-      field: 'item_name_en',
-      headerName: '영문명',
-      flex: 1,
-      minWidth: 150,
-      filter: false,
-    },
-    {
-      field: 'impa_code',
-      headerName: 'IMPA',
-      width: 100,
-      filter: false,
-    },
-    {
-      field: 'issa_code',
-      headerName: 'ISSA',
-      width: 100,
-      filter: false,
-    },
-    {
-      field: 'category',
-      headerName: '카테고리',
-      width: 140,
-      filter: false,
-    },
-    {
-      field: 'brand',
-      headerName: '브랜드',
-      width: 120,
-      filter: false,
-    },
-    {
-      field: 'unit',
-      headerName: '단위',
-      width: 80,
-      filter: false,
-    },
-    {
-      field: 'price_krw',
-      headerName: '단가(KRW)',
-      width: 120,
-      filter: false,
-      valueFormatter: (params) =>
-        params.value ? `₩${Number(params.value).toLocaleString()}` : '-',
-    },
-  ], [])
-
-  const defaultColDef: ColDef = useMemo(() => ({
-    resizable: true,
-    sortable: true,
-  }), [])
-
-  const datasource: IDatasource = useMemo(() => ({
+  // Build a fresh datasource whenever filters change
+  const buildDatasource = useCallback((): IDatasource => ({
     getRows: async (params) => {
       try {
         const { startRow, endRow, sortModel } = params
@@ -268,26 +229,22 @@ export default function ProductGrid({ category, search }: ProductGridProps) {
     },
   }), [category, search])
 
-  const onGridReady = useCallback((params: GridReadyEvent) => {
-    params.api.setGridOption('datasource', datasource)
-  }, [datasource])
-
-  const prevCategory = useRef(category)
-  const prevSearch = useRef(search)
-  if (prevCategory.current !== category || prevSearch.current !== search) {
-    prevCategory.current = category
-    prevSearch.current = search
+  // Push new datasource to grid when filters change (proper useEffect, not render side-effect)
+  useEffect(() => {
     if (gridRef.current?.api) {
-      gridRef.current.api.setGridOption('datasource', datasource)
+      gridRef.current.api.setGridOption('datasource', buildDatasource())
     }
-  }
+  }, [buildDatasource])
 
-  if (isMobile) {
-    return <MobileProductList category={category} search={search} />
-  }
+  const onGridReady = useCallback((params: GridReadyEvent) => {
+    params.api.setGridOption('datasource', buildDatasource())
+  }, [buildDatasource])
+
+  if (isMobile === null) return null
+  if (isMobile) return <MobileProductList category={category} search={search} />
 
   return (
-    <div className="ag-theme-alpine w-full h-[calc(100vh-220px)] rounded-2xl overflow-hidden border border-[#E5E8EB]">
+    <div className="ag-theme-alpine w-full h-full rounded-2xl overflow-hidden border border-[#E5E8EB]">
       <AgGridReact
         ref={gridRef}
         columnDefs={columnDefs}
@@ -295,13 +252,14 @@ export default function ProductGrid({ category, search }: ProductGridProps) {
         rowModelType="infinite"
         cacheBlockSize={100}
         maxBlocksInCache={10}
-        infiniteInitialRowCount={1000}
-        datasource={datasource}
+        infiniteInitialRowCount={100}
         onGridReady={onGridReady}
+        getRowId={(params) => String(params.data.id)}
         rowHeight={48}
         headerHeight={44}
         animateRows={false}
         suppressCellFocus={true}
+        suppressRowHoverHighlight={true}
         suppressMovableColumns={false}
         enableCellTextSelection={true}
       />
