@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/i18n'
@@ -26,6 +26,14 @@ export default function CatalogLoginPage() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Sign out any existing session so users arriving from a redirect start fresh
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) supabase.auth.signOut()
+    })
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

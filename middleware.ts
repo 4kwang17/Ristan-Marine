@@ -95,7 +95,15 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!profile || !profile.is_active || new Date(profile.expires_at) < new Date()) {
+    // Profile missing or account deactivated → treat as not logged in, go to login
+    if (!profile || !profile.is_active) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/catalog/login'
+      return NextResponse.redirect(url)
+    }
+
+    // 3-month catalog access period has expired → show expired page
+    if (new Date(profile.expires_at) < new Date()) {
       const url = request.nextUrl.clone()
       url.pathname = '/catalog/expired'
       return NextResponse.redirect(url)
